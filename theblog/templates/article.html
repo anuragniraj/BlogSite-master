@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title_tag }}{% endblock %}
+{% block content %}
+<h1>{{ post.title }}</h1>
+<div><i>{{ post.author.first_name }} {{post.author.last_name}} - {{post.post_date}}</i></div><hr/>
+{% if post.header_image %}
+<img src="{{ post.header_image.url }}" width="200" height="100" />
+{% endif %}
+    <br><p class="article-content">{{ post.body }}</p>
+    <hr/>
+    
+    {% if user.is_authenticated %}
+    <form action="{% url 'like-post' post.pk %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-primary btn-sm">Like</button>-{{ total_likes }}(Likes)
+    </form> <br/>
+    <h2>Comments</h2>
+    {% if not post.comments.all %}
+     No comments yet <br/><a href="{% url 'add-comment' post.pk %}">Add comment</a>
+    {% else %}
+    <a href="{% url 'add-comment' post.pk %}">Add comment</a>
+    <br/><br/>
+    {% for comment in  post.comments.all%}
+    <strong>
+        {{ comment.name }}-{{ comment.date_added }}
+    </strong>
+    <div>
+        {{ comment.body }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <br/>
+    {% if user.id == post.author.id %}
+    <br/><a href="{% url 'update-post' post.pk %}" class="btn btn-dark">Edit</a>
+    <!-- <a href="{% url 'delete-post' post.pk %}" class="btn btn-danger">Delete</a> -->
+    <script type='text/javascript'>
+
+        function foo() {
+        
+        
+        var user_choice = window.confirm('Are you sure?');
+        
+        
+        if(user_choice==true) {
+        
+            window.location.href = "{% url 'delete-post' post.pk %}";
+        
+        
+        } else {
+        
+        
+        return false;
+        
+        
+        }
+        }
+        
+        </script>
+        
+        <input type="button" class="btn btn-danger" onClick="foo()" value="Delete">
+        
+        {% endif %}
+    {% endif %}
+    
+    <br/><br/>
+    <div>
+        <a href="{% url 'home' %}" class="btn btn-primary">Back</a>
+    </div><br/><br/>
+{% endblock %}
